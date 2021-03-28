@@ -7,7 +7,7 @@ Created on Sun Mar 28 12:40:56 2021
 
 import cv2
 filepath = 'wolf.mp4'
-
+filepath = 'manrunning.webm'
 # helping functions
 def DrawBoundingBox(frame,bbox,color= (255,0,0),thickness=2):
     (x, y, w, h) = [int(d) for d in bbox]
@@ -25,7 +25,7 @@ def CropFrame(frame,composition=None,currentObjCenter=None):
         (x, y, w, h) = [int(d) for d in composition]
         framepadded = cv2.copyMakeBorder(frame,h,h,w,w,cv2.BORDER_CONSTANT,None,0) # without padding overflows
         dx,dy=currentObjCenter[0]-objCenter[0],currentObjCenter[1]-objCenter[1]
-        framecropped=framepadded[h+y+dy:h+y+h+dy,w+x+dx:w+x+dx+w]
+        framecropped=framepadded[h+y+dy-1:h+y+h+dy,w+x+dx-1:w+x+dx+w]
     return framecropped
     
 
@@ -83,6 +83,10 @@ while True:
                 DrawBoundingBox(frame, tracking)
                 objCenter=GetBoxCenter(tracking)
                 composition = cv2.selectROI("Select Composition",frame,fromCenter=False,showCrosshair=True)
+                (x, y, w, h) = [int(d) for d in composition]
+                if x==0 and y==0 and w==0 and h==0:
+                    dim = frame.shape[:2]
+                    composition=(0,0,dim[1],dim[0])
                 cv2.destroyAllWindows()
         
         elif key == ord("q"): #stop video
